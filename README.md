@@ -53,6 +53,8 @@ Options:
 - `--dryrun`: Perform dry run without copying files
 - `--no-overwrite`: Fail if destination files already exist (default: overwrite)
 
+**Windows Note**: Avoid trailing backslashes in quoted paths (use `"D:\path"` not `"D:\path\"`) as the backslash escapes the closing quote.
+
 ## Quick Start
 
 **Organize master calibration frames:**

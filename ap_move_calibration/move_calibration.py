@@ -122,11 +122,15 @@ def build_destination_path(
     Raises:
         ValueError: If required metadata is missing for the given frame type
     """
+    # Check for required 'type' field
+    if "type" not in datum:
+        raise ValueError(f"Missing 'type' metadata in {source_file}")
+
     frame_type = datum["type"]
 
     # Validate frame type
     if frame_type not in config.REQUIRED_PROPERTIES:
-        raise ValueError(f"Unknown frame type: {frame_type}")
+        raise ValueError(f"Unknown frame type '{frame_type}' in {source_file}")
 
     # Get file extension
     file_extension = os.path.splitext(source_file)[1]
@@ -267,8 +271,8 @@ def copy_calibration_frames(
                     debug=debug,
                 )
                 copy_list.append((source_file, dest_file))
-            except ValueError as e:
-                logger.warning(f"Skipping file due to missing metadata: {e}")
+            except (ValueError, KeyError) as e:
+                logger.warning(f"Skipping {source_file}: {e}")
                 stats[frame_type]["skipped"] += 1
                 continue
 
