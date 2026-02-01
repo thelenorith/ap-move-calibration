@@ -7,65 +7,70 @@ Defines metadata properties used for organizing and naming master calibration fr
 Uses normalized keyword names from ap-common normalization.
 """
 
-# Normalized keyword names (as returned by ap-common)
-# These match the normalized output from ap_common.normalize_headers()
-KEYWORD_TYPE = "type"  # From IMAGETYP
-KEYWORD_CAMERA = "camera"  # From INSTRUME
-KEYWORD_GAIN = "gain"  # From GAIN (lowercase)
-KEYWORD_OFFSET = "offset"  # From OFFSET (lowercase)
-KEYWORD_SETTEMP = "settemp"  # From SET-TEMP or SETTEMP
-KEYWORD_READOUTMODE = "readoutmode"  # From READOUTM
-KEYWORD_EXPOSURESECONDS = "exposureseconds"  # From EXPOSURE/EXPTIME/EXP
-KEYWORD_DATE = "date"  # From DATE-OBS
-KEYWORD_FILTER = "filter"  # From FILTER
-KEYWORD_FOCALLEN = "focallen"  # From FOCALLEN
-KEYWORD_OPTIC = "optic"  # From TELESCOP or other optic identifier
+# Import constants from ap-common
+from ap_common.constants import (
+    NORMALIZED_HEADER_TYPE,
+    NORMALIZED_HEADER_CAMERA,
+    NORMALIZED_HEADER_GAIN,
+    NORMALIZED_HEADER_OFFSET,
+    NORMALIZED_HEADER_SETTEMP,
+    NORMALIZED_HEADER_READOUTMODE,
+    NORMALIZED_HEADER_EXPOSURESECONDS,
+    NORMALIZED_HEADER_DATE,
+    NORMALIZED_HEADER_FILTER,
+    NORMALIZED_HEADER_FOCALLEN,
+    NORMALIZED_HEADER_OPTIC,
+    TYPE_MASTER_BIAS,
+    TYPE_MASTER_DARK,
+    TYPE_MASTER_FLAT,
+    MASTER_CALIBRATION_TYPES,
+)
 
 # Required metadata properties for each frame type
 # These are used to validate that files can be properly organized
 REQUIRED_PROPERTIES = {
-    "MASTER BIAS": [
-        KEYWORD_CAMERA,  # Required for directory structure
+    TYPE_MASTER_BIAS: [
+        NORMALIZED_HEADER_CAMERA,  # Required for directory structure
     ],
-    "MASTER DARK": [
-        KEYWORD_CAMERA,  # Required for directory structure
+    TYPE_MASTER_DARK: [
+        NORMALIZED_HEADER_CAMERA,  # Required for directory structure
     ],
-    "MASTER FLAT": [
-        KEYWORD_CAMERA,  # Required for directory structure
-        KEYWORD_DATE,  # Required for date subdirectory
+    TYPE_MASTER_FLAT: [
+        NORMALIZED_HEADER_CAMERA,  # Required for directory structure
+        NORMALIZED_HEADER_DATE,  # Required for date subdirectory
     ],
 }
 
 # Metadata properties included in filenames for each frame type
 # Order matters - properties appear in filename in this order
 FILENAME_PROPERTIES = {
-    "MASTER BIAS": [
-        KEYWORD_GAIN,
-        KEYWORD_OFFSET,
-        KEYWORD_SETTEMP,
-        KEYWORD_READOUTMODE,
+    TYPE_MASTER_BIAS: [
+        NORMALIZED_HEADER_GAIN,
+        NORMALIZED_HEADER_OFFSET,
+        NORMALIZED_HEADER_SETTEMP,
+        NORMALIZED_HEADER_READOUTMODE,
     ],
-    "MASTER DARK": [
-        KEYWORD_EXPOSURESECONDS,  # Must be first for dark frames
-        KEYWORD_GAIN,
-        KEYWORD_OFFSET,
-        KEYWORD_SETTEMP,
-        KEYWORD_READOUTMODE,
+    TYPE_MASTER_DARK: [
+        NORMALIZED_HEADER_EXPOSURESECONDS,  # Must be first for dark frames
+        NORMALIZED_HEADER_GAIN,
+        NORMALIZED_HEADER_OFFSET,
+        NORMALIZED_HEADER_SETTEMP,
+        NORMALIZED_HEADER_READOUTMODE,
     ],
-    "MASTER FLAT": [
-        KEYWORD_FILTER,
-        KEYWORD_GAIN,
-        KEYWORD_OFFSET,
-        KEYWORD_SETTEMP,
-        KEYWORD_FOCALLEN,
-        KEYWORD_READOUTMODE,
+    TYPE_MASTER_FLAT: [
+        NORMALIZED_HEADER_FILTER,
+        NORMALIZED_HEADER_GAIN,
+        NORMALIZED_HEADER_OFFSET,
+        NORMALIZED_HEADER_SETTEMP,
+        NORMALIZED_HEADER_FOCALLEN,
+        NORMALIZED_HEADER_READOUTMODE,
     ],
 }
 
 # Optional metadata properties
 # These are used if present but do not cause failures if missing
 OPTIONAL_PROPERTIES = {
-    "MASTER FLAT": [
-        KEYWORD_OPTIC,  # Optional optic subdirectory for flats
+    TYPE_MASTER_FLAT: [
+        NORMALIZED_HEADER_OPTIC,  # Optional optic subdirectory for flats
     ],
 }

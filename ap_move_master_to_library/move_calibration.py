@@ -12,8 +12,10 @@ import os
 import sys
 
 from ap_common.filesystem import copy_file
+from ap_common.logging_config import setup_logging
 from ap_common.metadata import get_filtered_metadata
 from ap_common.normalization import denormalize_header
+from ap_common.progress import progress_iter
 from ap_common.utils import camelCase, replace_env_vars
 
 from . import config
@@ -59,7 +61,9 @@ def _build_bias_path(datum: dict, dest_dir: str, filename: str) -> str:
     Returns:
         Full destination path
     """
-    return os.path.join(dest_dir, datum["type"], datum[config.KEYWORD_CAMERA], filename)
+    return os.path.join(
+        dest_dir, datum["type"], datum[config.NORMALIZED_HEADER_CAMERA], filename
+    )
 
 
 def _build_dark_path(datum: dict, dest_dir: str, filename: str) -> str:
@@ -74,7 +78,9 @@ def _build_dark_path(datum: dict, dest_dir: str, filename: str) -> str:
     Returns:
         Full destination path
     """
-    return os.path.join(dest_dir, datum["type"], datum[config.KEYWORD_CAMERA], filename)
+    return os.path.join(
+        dest_dir, datum["type"], datum[config.NORMALIZED_HEADER_CAMERA], filename
+    )
 
 
 def _build_flat_path(datum: dict, dest_dir: str, filename: str) -> str:
@@ -89,15 +95,15 @@ def _build_flat_path(datum: dict, dest_dir: str, filename: str) -> str:
     Returns:
         Full destination path
     """
-    date_subdir = f"DATE_{datum[config.KEYWORD_DATE]}"
+    date_subdir = f"DATE_{datum[config.NORMALIZED_HEADER_DATE]}"
 
-    dest_path_parts = [dest_dir, datum["type"], datum[config.KEYWORD_CAMERA]]
+    dest_path_parts = [dest_dir, datum["type"], datum[config.NORMALIZED_HEADER_CAMERA]]
     if (
-        config.KEYWORD_OPTIC in datum
-        and datum[config.KEYWORD_OPTIC] is not None
-        and len(datum[config.KEYWORD_OPTIC]) > 0
+        config.NORMALIZED_HEADER_OPTIC in datum
+        and datum[config.NORMALIZED_HEADER_OPTIC] is not None
+        and len(datum[config.NORMALIZED_HEADER_OPTIC]) > 0
     ):
-        dest_path_parts.append(datum[config.KEYWORD_OPTIC])
+        dest_path_parts.append(datum[config.NORMALIZED_HEADER_OPTIC])
     dest_path_parts.append(date_subdir)
     dest_path_parts.append(filename)
 
@@ -145,11 +151,11 @@ def build_destination_path(
     filename = _build_filename(datum, file_extension)
 
     # Build path based on type
-    if frame_type == "MASTER BIAS":
+    if frame_type == config.TYPE_MASTER_BIAS:
         dest_path = _build_bias_path(datum, dest_dir, filename)
-    elif frame_type == "MASTER DARK":
+    elif frame_type == config.TYPE_MASTER_DARK:
         dest_path = _build_dark_path(datum, dest_dir, filename)
-    elif frame_type == "MASTER FLAT":
+    elif frame_type == config.TYPE_MASTER_FLAT:
         dest_path = _build_flat_path(datum, dest_dir, filename)
 
     return os.path.normpath(dest_path)
@@ -183,20 +189,19 @@ def _print_summary(stats: dict, dryrun: bool):
     logger.info("=" * 60)
     logger.info("SUMMARY")
     logger.info("=" * 60)
-    for frame_type in ["MASTER BIAS", "MASTER DARK", "MASTER FLAT"]:
-        logger.info(f"{frame_type}:")
-        logger.info(f"  Scanned: {stats[frame_type]['scanned']}")
-        logger.info(f"  Copied:  {stats[frame_type]['copied']}")
-        logger.info(f"  Skipped: {stats[frame_type]['skipped']}")
+    for frame_type in config.MASTER_CALIBRATION_TYPES:
+        logger.info(
+            f"{frame_type}: scanned={stats[frame_type]['scanned']}, "
+            f"copied={stats[frame_type]['copied']}, skipped={stats[frame_type]['skipped']}"
+        )
 
     total_scanned = sum(s["scanned"] for s in stats.values())
     total_copied = sum(s["copied"] for s in stats.values())
     total_skipped = sum(s["skipped"] for s in stats.values())
 
-    logger.info("TOTAL:")
-    logger.info(f"  Scanned: {total_scanned}")
-    logger.info(f"  Copied:  {total_copied}")
-    logger.info(f"  Skipped: {total_skipped}")
+    logger.info(
+        f"TOTAL: scanned={total_scanned}, copied={total_copied}, skipped={total_skipped}"
+    )
     logger.info("=" * 60)
 
     if dryrun:
@@ -236,13 +241,13 @@ def copy_calibration_frames(
 
     # Track statistics
     stats = {
-        "MASTER BIAS": {"scanned": 0, "copied": 0, "skipped": 0},
-        "MASTER DARK": {"scanned": 0, "copied": 0, "skipped": 0},
-        "MASTER FLAT": {"scanned": 0, "copied": 0, "skipped": 0},
+        config.TYPE_MASTER_BIAS: {"scanned": 0, "copied": 0, "skipped": 0},
+        config.TYPE_MASTER_DARK: {"scanned": 0, "copied": 0, "skipped": 0},
+        config.TYPE_MASTER_FLAT: {"scanned": 0, "copied": 0, "skipped": 0},
     }
 
     # Process each calibration type
-    for frame_type in ["MASTER BIAS", "MASTER DARK", "MASTER FLAT"]:
+    for frame_type in config.MASTER_CALIBRATION_TYPES:
         logger.debug(f"Scanning for {frame_type} frames...")
 
         # Get all calibration frames of this type
@@ -340,12 +345,8 @@ def main():
 
     args = parser.parse_args()
 
-    # Configure logging
-    log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(
-        level=log_level,
-        format="%(levelname)s: %(message)s",
-    )
+    # Setup logging
+    logger = setup_logging(name="ap_move_master_to_library", debug=args.debug)
 
     try:
         copy_calibration_frames(
