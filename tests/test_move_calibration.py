@@ -8,7 +8,7 @@ import pytest
 import tempfile
 from unittest.mock import patch, MagicMock
 
-from ap_move_calibration.move_calibration import (
+from ap_move_master_to_library.move_calibration import (
     build_destination_path,
     copy_calibration_frames,
     _build_filename,
@@ -576,7 +576,7 @@ def test_copy_calibration_frames_no_files():
     with tempfile.TemporaryDirectory() as tmpdir:
         # Mock get_filtered_metadata to return empty results
         with patch(
-            "ap_move_calibration.move_calibration.get_filtered_metadata"
+            "ap_move_master_to_library.move_calibration.get_filtered_metadata"
         ) as mock_get_metadata:
             mock_get_metadata.return_value = {}
 
@@ -628,11 +628,11 @@ def test_copy_calibration_frames_with_files():
             return {}
 
         with patch(
-            "ap_move_calibration.move_calibration.get_filtered_metadata",
+            "ap_move_master_to_library.move_calibration.get_filtered_metadata",
             side_effect=mock_get_metadata,
         ):
             with patch(
-                "ap_move_calibration.move_calibration.copy_file"
+                "ap_move_master_to_library.move_calibration.copy_file"
             ) as mock_copy_file:
                 copy_calibration_frames(source_dir=tmpdir, dest_dir=tmpdir)
 
@@ -658,11 +658,11 @@ def test_copy_calibration_frames_dryrun():
             return {}
 
         with patch(
-            "ap_move_calibration.move_calibration.get_filtered_metadata",
+            "ap_move_master_to_library.move_calibration.get_filtered_metadata",
             side_effect=mock_get_metadata,
         ):
             with patch(
-                "ap_move_calibration.move_calibration.copy_file"
+                "ap_move_master_to_library.move_calibration.copy_file"
             ) as mock_copy_file:
                 copy_calibration_frames(source_dir=tmpdir, dest_dir=tmpdir, dryrun=True)
 
@@ -693,7 +693,7 @@ def test_copy_calibration_frames_no_overwrite_with_collision():
         }
 
         with patch(
-            "ap_move_calibration.move_calibration.get_filtered_metadata",
+            "ap_move_master_to_library.move_calibration.get_filtered_metadata",
             return_value=bias_metadata,
         ):
             with pytest.raises(FileExistsError, match="existing files"):
@@ -715,11 +715,11 @@ def test_copy_calibration_frames_missing_metadata():
         }
 
         with patch(
-            "ap_move_calibration.move_calibration.get_filtered_metadata",
+            "ap_move_master_to_library.move_calibration.get_filtered_metadata",
             return_value=bias_metadata,
         ):
             with patch(
-                "ap_move_calibration.move_calibration.copy_file"
+                "ap_move_master_to_library.move_calibration.copy_file"
             ) as mock_copy_file:
                 # Should not raise, but skip the file
                 copy_calibration_frames(source_dir=tmpdir, dest_dir=tmpdir)
@@ -740,11 +740,11 @@ def test_copy_calibration_frames_copy_failure():
         }
 
         with patch(
-            "ap_move_calibration.move_calibration.get_filtered_metadata",
+            "ap_move_master_to_library.move_calibration.get_filtered_metadata",
             return_value=bias_metadata,
         ):
             with patch(
-                "ap_move_calibration.move_calibration.copy_file",
+                "ap_move_master_to_library.move_calibration.copy_file",
                 side_effect=Exception("Copy failed"),
             ):
                 # Should not raise, but log error

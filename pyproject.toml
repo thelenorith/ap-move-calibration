@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ap-move-calibration"
+name = "ap-move-master-to-library"
 version = "0.1.0"
 description = "Copy and organize master calibration frames from source to organized library based on FITS/XISF header metadata"
 readme = "README.md"
@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ap-move-calibration = "ap_move_calibration.move_calibration:main"
+ap-move-master-to-library = "ap_move_master_to_library.move_calibration:main"
 
 [project.optional-dependencies]
 dev = [
@@ -45,7 +45,7 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["ap_move_calibration"]
+packages = ["ap_move_master_to_library"]
 
 [tool.setuptools.package-data]
 "*" = ["*.txt", "*.md"]

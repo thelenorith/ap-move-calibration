@@ -12,17 +12,17 @@ install-dev:
 	$(PYTHON) -m pip install -e ".[dev]"
 
 uninstall:
-	$(PYTHON) -m pip uninstall -y ap-move-calibration
+	$(PYTHON) -m pip uninstall -y ap-move-master-to-library
 
 clean:
 	rm -rf build/ dist/ *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 format: install-dev
-	$(PYTHON) -m black ap_move_calibration tests
+	$(PYTHON) -m black ap_move_master_to_library tests
 
 lint: install-dev
-	$(PYTHON) -m flake8 --max-line-length=88 --extend-ignore=E203,W503,E501,F401 ap_move_calibration tests
+	$(PYTHON) -m flake8 --max-line-length=88 --extend-ignore=E203,W503,E501,F401 ap_move_master_to_library tests
 
 # Testing (install deps first, then run tests)
 test: install-dev
@@ -32,7 +32,7 @@ test-verbose: install-dev
 	$(PYTHON) -m pytest -v
 
 typecheck: install-dev
-	$(PYTHON) -m mypy ap_move_calibration || true
+	$(PYTHON) -m mypy ap_move_master_to_library || true
 
 coverage: install-dev
-	$(PYTHON) -m pytest --cov=ap_move_calibration --cov-report=term
+	$(PYTHON) -m pytest --cov=ap_move_master_to_library --cov-report=term

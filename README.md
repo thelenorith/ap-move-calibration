@@ -1,9 +1,9 @@
-# ap-move-calibration
+# ap-move-master-to-library
 
-[![Test](https://github.com/jewzaam/ap-move-calibration/workflows/Test/badge.svg)](https://github.com/jewzaam/ap-move-calibration/actions/workflows/test.yml)
-[![Coverage](https://github.com/jewzaam/ap-move-calibration/workflows/Coverage%20Check/badge.svg)](https://github.com/jewzaam/ap-move-calibration/actions/workflows/coverage.yml)
-[![Lint](https://github.com/jewzaam/ap-move-calibration/workflows/Lint/badge.svg)](https://github.com/jewzaam/ap-move-calibration/actions/workflows/lint.yml)
-[![Format](https://github.com/jewzaam/ap-move-calibration/workflows/Format%20Check/badge.svg)](https://github.com/jewzaam/ap-move-calibration/actions/workflows/format.yml)
+[![Test](https://github.com/jewzaam/ap-move-master-to-library/workflows/Test/badge.svg)](https://github.com/jewzaam/ap-move-master-to-library/actions/workflows/test.yml)
+[![Coverage](https://github.com/jewzaam/ap-move-master-to-library/workflows/Coverage%20Check/badge.svg)](https://github.com/jewzaam/ap-move-master-to-library/actions/workflows/coverage.yml)
+[![Lint](https://github.com/jewzaam/ap-move-master-to-library/workflows/Lint/badge.svg)](https://github.com/jewzaam/ap-move-master-to-library/actions/workflows/lint.yml)
+[![Format](https://github.com/jewzaam/ap-move-master-to-library/workflows/Format%20Check/badge.svg)](https://github.com/jewzaam/ap-move-master-to-library/actions/workflows/format.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -35,13 +35,13 @@ make install-dev
 ### From Git
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-move-calibration.git
+pip install git+https://github.com/jewzaam/ap-move-master-to-library.git
 ```
 
 ## Usage
 
 ```powershell
-python -m ap_move_calibration <source_dir> <dest_dir> [--debug] [--dryrun] [--no-overwrite]
+python -m ap_move_master_to_library <source_dir> <dest_dir> [--debug] [--dryrun] [--no-overwrite]
 ```
 
 Options:
@@ -57,17 +57,17 @@ Options:
 
 **Organize master calibration frames:**
 ```powershell
-python -m ap_move_calibration "D:\WBPP\_calibration\master" "D:\Calibration_Library"
+python -m ap_move_master_to_library "D:\WBPP\_calibration\master" "D:\Calibration_Library"
 ```
 
 **Dry run to preview changes:**
 ```powershell
-python -m ap_move_calibration "D:\WBPP\_calibration\master" "D:\Calibration_Library" --dryrun
+python -m ap_move_master_to_library "D:\WBPP\_calibration\master" "D:\Calibration_Library" --dryrun
 ```
 
 **Check for collisions without overwriting:**
 ```powershell
-python -m ap_move_calibration "D:\WBPP\_calibration\master" "D:\Calibration_Library" --no-overwrite
+python -m ap_move_master_to_library "D:\WBPP\_calibration\master" "D:\Calibration_Library" --no-overwrite
 ```
 
 ## Output Structure
