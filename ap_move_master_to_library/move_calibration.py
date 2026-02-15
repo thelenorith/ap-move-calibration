@@ -18,6 +18,8 @@ from ap_common.normalization import denormalize_header
 from ap_common.progress import progress_iter, ProgressTracker
 from ap_common.utils import camelCase, replace_env_vars
 
+from ap_common.constants import DEFAULT_CALIBRATION_PATTERNS, NORMALIZED_HEADER_TYPE
+
 from . import config
 
 # Exit code constants
@@ -43,10 +45,10 @@ def _build_filename(datum: dict, file_extension: str) -> str:
         Filename string
     """
     # Use camelCase for type prefix (e.g., "MASTER BIAS" -> "masterBias")
-    output_filename = camelCase(datum["type"])
+    output_filename = camelCase(datum[NORMALIZED_HEADER_TYPE])
 
     # Add metadata to filename
-    for key in config.FILENAME_PROPERTIES[datum["type"]]:
+    for key in config.FILENAME_PROPERTIES[datum[NORMALIZED_HEADER_TYPE]]:
         if key in datum and datum[key] is not None:
             p = denormalize_header(key)
             if p is None:
@@ -70,7 +72,10 @@ def _build_bias_path(datum: dict, dest_dir: str, filename: str) -> str:
         Full destination path
     """
     return os.path.join(
-        dest_dir, datum["type"], datum[config.NORMALIZED_HEADER_CAMERA], filename
+        dest_dir,
+        datum[NORMALIZED_HEADER_TYPE],
+        datum[config.NORMALIZED_HEADER_CAMERA],
+        filename,
     )
 
 
@@ -87,7 +92,10 @@ def _build_dark_path(datum: dict, dest_dir: str, filename: str) -> str:
         Full destination path
     """
     return os.path.join(
-        dest_dir, datum["type"], datum[config.NORMALIZED_HEADER_CAMERA], filename
+        dest_dir,
+        datum[NORMALIZED_HEADER_TYPE],
+        datum[config.NORMALIZED_HEADER_CAMERA],
+        filename,
     )
 
 
@@ -105,7 +113,11 @@ def _build_flat_path(datum: dict, dest_dir: str, filename: str) -> str:
     """
     date_subdir = f"DATE_{datum[config.NORMALIZED_HEADER_DATE]}"
 
-    dest_path_parts = [dest_dir, datum["type"], datum[config.NORMALIZED_HEADER_CAMERA]]
+    dest_path_parts = [
+        dest_dir,
+        datum[NORMALIZED_HEADER_TYPE],
+        datum[config.NORMALIZED_HEADER_CAMERA],
+    ]
     if (
         config.NORMALIZED_HEADER_OPTIC in datum
         and datum[config.NORMALIZED_HEADER_OPTIC] is not None
@@ -137,10 +149,12 @@ def build_destination_path(
         ValueError: If required metadata is missing for the given frame type
     """
     # Check for required 'type' field
-    if "type" not in datum:
-        raise ValueError(f"Missing 'type' metadata in {source_file}")
+    if NORMALIZED_HEADER_TYPE not in datum:
+        raise ValueError(
+            f"Missing '{NORMALIZED_HEADER_TYPE}' metadata in {source_file}"
+        )
 
-    frame_type = datum["type"]
+    frame_type = datum[NORMALIZED_HEADER_TYPE]
 
     # Validate frame type
     if frame_type not in config.REQUIRED_PROPERTIES:
@@ -263,10 +277,10 @@ def copy_calibration_frames(
         # Get all calibration frames of this type
         metadata = get_filtered_metadata(
             dirs=[source_dir],
-            patterns=[r".*\.xisf$", r".*\.fits$"],
+            patterns=DEFAULT_CALIBRATION_PATTERNS,
             recursive=True,
             required_properties=[],
-            filters={"type": frame_type},
+            filters={NORMALIZED_HEADER_TYPE: frame_type},
             debug=debug,
             profileFromPath=False,
         )
